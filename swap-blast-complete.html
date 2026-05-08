@@ -3,31 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NEON BLAST - Pro & Addictive</title>
-  <script>
-    window.onerror = function(msg, url, lineNo, columnNo, error) {
-      const err = `Error: ${msg}\nLine: ${lineNo}\nFile: ${url}`;
-      console.error(err);
-      const errorDiv = document.createElement('div');
-      errorDiv.style = 'position:fixed;top:0;left:0;width:100%;background:red;color:white;padding:20px;z-index:9999;font-family:monospace;word-break:break-all;';
-      errorDiv.innerHTML = err.replace(/\n/g, '<br>');
-      if (document.body) document.body.appendChild(errorDiv);
-      return false;
-    };
-  </script>
-  <script>
-    function loadFallback(src) {
-      const script = document.createElement('script');
-      script.src = src; script.crossOrigin = "anonymous";
-      document.head.appendChild(script);
-    }
-  </script>
-  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" onerror="loadFallback('/react.min.js')"></script>
-  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" onerror="loadFallback('/react-dom.min.js')"></script>
+  <title>NEON BLAST - Premium Drag Edition</title>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <style>
     :root {
       --bg: #050505;
-      --card-bg: rgba(20, 20, 30, 0.9);
+      --card-bg: rgba(15, 15, 30, 0.95);
       --accent: #00f2ff;
       --success: #00ff88;
       --danger: #ff0055;
@@ -36,87 +18,59 @@
       --border: rgba(255, 255, 255, 0.1);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-    
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { 
-      font-family: 'Outfit', 'Inter', sans-serif; 
-      background: var(--bg); color: #fff; overflow-x: hidden; min-height: 100vh;
+      font-family: 'Outfit', sans-serif; background: var(--bg); color: #fff;
+      overflow: hidden; touch-action: none; height: 100vh;
       background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050505 100%);
     }
 
     .app-container {
-      max-width: 1200px; margin: 0 auto; padding: 10px;
-      display: flex; flex-direction: column; gap: 15px; align-items: center;
-    }
-
-    @media (min-width: 1024px) {
-      .app-container { flex-direction: row; align-items: flex-start; justify-content: center; padding-top: 30px; }
+      height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px;
     }
 
     .game-panel {
-      background: var(--card-bg); backdrop-filter: blur(20px);
-      border: 1px solid var(--border); border-radius: 32px;
-      padding: 20px; width: 100%; max-width: 450px;
-      box-shadow: 0 40px 80px rgba(0,0,0,0.8); position: relative;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 32px;
+      padding: 20px; width: 100%; max-width: 450px; position: relative;
+      box-shadow: 0 0 50px rgba(0,0,0,0.8);
     }
 
-    .game-header { text-align: center; margin-bottom: 15px; }
     .game-header h1 {
-      font-size: 30px; font-weight: 900;
+      font-size: 30px; font-weight: 900; text-align: center; margin-bottom: 15px;
       background: linear-gradient(to right, var(--accent), #7000ff);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      letter-spacing: -2px; text-transform: uppercase;
+      letter-spacing: -1px; text-transform: uppercase;
     }
 
     canvas {
       display: block; border-radius: 24px; background: rgba(0,0,0,0.5);
       border: 2px solid var(--border); cursor: pointer;
-      touch-action: none; width: 100%; height: auto;
+      box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
     }
 
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-    .stat-card {
-      background: var(--glass); padding: 10px; border-radius: 20px;
-      text-align: center; border: 1px solid var(--border);
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+    .stat-box { background: var(--glass); padding: 10px; border-radius: 18px; text-align: center; border: 1px solid var(--border); }
+    .stat-label { font-size: 10px; color: #888; text-transform: uppercase; font-weight: 700; }
+    .stat-value { font-size: 22px; font-weight: 900; color: #fff; }
+
+    .btn-action {
+      background: linear-gradient(135deg, #2563eb, #7c3aed); color: white;
+      border: none; padding: 18px; border-radius: 20px; font-size: 16px; font-weight: 800;
+      width: 100%; margin-top: 15px; cursor: pointer; transition: 0.2s;
     }
-    .stat-label { font-size: 9px; color: #888; text-transform: uppercase; font-weight: 700; }
-    .stat-value { font-size: 18px; font-weight: 900; margin-top: 2px; }
-    .score-pts { color: var(--success); }
+    .btn-action:active { transform: scale(0.95); }
 
-    .dashboard-panel { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
-    .glass-card { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 24px; padding: 18px; }
-
-    .player-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .avatar { width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 900; }
-    .nick-info { display: flex; flex-direction: column; }
-    .nick-label { font-size: 10px; color: #888; text-transform: uppercase; }
-    .nick-name { font-size: 16px; font-weight: 700; color: #fff; }
-
-    .leaderboard-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-    .leaderboard-item.me { background: rgba(0, 242, 255, 0.1); border-radius: 8px; padding: 8px 10px; margin: 0 -10px; }
-
-    .controls { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
-    button {
-      background: linear-gradient(to right, #2563eb, #7c3aed);
-      color: white; border: none; padding: 16px; border-radius: 18px;
-      font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.2s;
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
     }
-    button:active { transform: scale(0.96); }
-    button.secondary { background: var(--glass); border: 1px solid var(--border); color: #888; }
+    .modal-content { background: var(--card-bg); border-radius: 28px; padding: 30px; width: 100%; max-width: 380px; text-align: center; border: 1px solid var(--border); }
     
-    .ad-placeholder {
-      width: 100%; height: 60px; background: rgba(255,255,255,0.03);
-      border-radius: 12px; border: 1px dashed #444; margin-top: 10px;
-      display: flex; align-items: center; justify-content: center;
-      color: #555; font-size: 11px; text-transform: uppercase;
-    }
+    .lb-card { background: var(--glass); border-radius: 18px; padding: 15px; margin-top: 15px; font-size: 13px; }
+    .lb-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .lb-row.me { color: var(--accent); font-weight: 900; }
 
-    .toast {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      padding: 25px; border-radius: 24px; z-index: 100; text-align: center;
-      font-size: 22px; font-weight: 900; text-transform: uppercase;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); border: 2px solid var(--accent);
-    }
+    .ad-banner { margin-top: 12px; width: 100%; height: 50px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #555; text-transform: uppercase; }
   </style>
 </head>
 <body>
@@ -124,7 +78,7 @@
 
   <script>
     const h = React.createElement;
-    const { useState, useEffect, useRef, useCallback } = React;
+    const { useState, useEffect, useRef } = React;
 
     const COLORS = [
       { main: '#ff3d00', glow: 'rgba(255, 61, 0, 0.6)' },
@@ -138,215 +92,209 @@
     const BLOCK_SIZE = 70;
     const CANVAS_SIZE = GRID_SIZE * BLOCK_SIZE + 20;
 
-    const PHASES = Array.from({ length: 100 }, (_, i) => ({
-      level: i + 1,
-      moves: Math.max(6, 25 - Math.floor(i / 2)),
-      target: 400 + (i * 600)
-    }));
-
-    class GameAudio {
-      constructor() { this.ctx = null; }
-      init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); if (this.ctx.state === 'suspended') this.ctx.resume(); }
-      play(f, t, d, v=0.2) {
-        if (!this.ctx) return;
-        const o = this.ctx.createOscillator(); const g = this.ctx.createGain();
-        o.type = t; o.frequency.setValueAtTime(f, this.ctx.currentTime);
-        g.gain.setValueAtTime(v, this.ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + d);
-        o.connect(g); g.connect(this.ctx.destination);
-        o.start(); o.stop(this.ctx.currentTime + d);
+    class Sound {
+      constructor() { this.c = null; }
+      init() { if(!this.c) this.c = new (window.AudioContext || window.webkitAudioContext)(); if(this.c.state === 'suspended') this.c.resume(); }
+      p(f, t, d, v=0.2) {
+        if(!this.c) return;
+        const o = this.c.createOscillator(); const g = this.c.createGain();
+        o.type = t; o.frequency.setValueAtTime(f, this.c.currentTime);
+        g.gain.setValueAtTime(v, this.c.currentTime); g.gain.exponentialRampToValueAtTime(0.01, this.c.currentTime + d);
+        o.connect(g); g.connect(this.c.destination); o.start(); o.stop(this.c.currentTime + d);
       }
-      playSwap() { this.play(300, 'sine', 0.1, 0.1); }
-      playMatch(c) { this.play(400 + (c*100), 'triangle', 0.2, 0.2); }
-      playError() { this.play(150, 'sawtooth', 0.2, 0.2); }
-      playWin() { [500, 600, 700, 800].forEach((f, i) => setTimeout(() => this.play(f, 'sine', 0.5, 0.2), i*100)); }
+      swap() { this.p(350, 'sine', 0.1, 0.1); }
+      match(c) { this.p(450 + (c*120), 'triangle', 0.3, 0.2); }
+      err() { this.p(140, 'sawtooth', 0.2, 0.2); }
+      win() { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => this.p(f, 'sine', 0.5, 0.2), i*100)); }
     }
-    const audio = new GameAudio();
+    const audio = new Sound();
 
-    function GameCanvas({ grid, onSwap, gameState, combo }) {
-      const canvasRef = useRef(null);
+    function App() {
+      const [state, setState] = useState(() => {
+        const saved = localStorage.getItem('neon_v5');
+        const defaultId = 'PLAYER_' + Math.random().toString(36).substr(2, 4).toUpperCase();
+        return saved ? JSON.parse(saved) : {
+          level: 1, score: 0, moves: 25,
+          grid: Array(25).fill(0).map(() => ({ color: COLORS[Math.floor(Math.random()*COLORS.length)].main })),
+          isProcessing: false, userId: defaultId
+        };
+      });
+
       const [selected, setSelected] = useState(null);
-      const [shake, setShake] = useState(0);
+      const [lb, setLb] = useState([]);
+      const [modal, setModal] = useState(null);
+      const canvasRef = useRef(null);
+      const dragRef = useRef(null);
 
-      useEffect(() => { if (combo > 0) setShake(15); }, [combo]);
+      useEffect(() => { localStorage.setItem('neon_v5', JSON.stringify(state)); }, [state]);
+      useEffect(() => { fetch('/api/leaderboard').then(r => r.json()).then(d => setLb(d)).catch(() => {}); }, [state.level]);
 
+      // Render Loop
       useEffect(() => {
-        const canvas = canvasRef.current; const ctx = canvas.getContext('2d');
+        const canvas = canvasRef.current; if(!canvas) return;
+        const ctx = canvas.getContext('2d');
         let frame;
-        const render = () => {
+        const draw = () => {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          if (shake > 0) { ctx.save(); ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake); setShake(s => Math.max(0, s-1.5)); }
-          grid.forEach((block, i) => {
+          state.grid.forEach((b, i) => {
             const x = (i % GRID_SIZE) * BLOCK_SIZE + 10;
             const y = Math.floor(i / GRID_SIZE) * BLOCK_SIZE + 10;
-            const c = COLORS.find(co => co.main === block.color) || COLORS[0];
-            const isSel = selected && selected.idx === i;
+            const c = COLORS.find(co => co.main === b.color) || COLORS[0];
+            const isS = selected && selected.idx === i;
             
-            ctx.shadowBlur = isSel ? 30 : 15; ctx.shadowColor = isSel ? '#fff' : c.glow;
+            ctx.shadowBlur = isS ? 30 : 15; ctx.shadowColor = isS ? '#fff' : c.glow;
             ctx.fillStyle = c.main;
-            const p = 8; const r = 16;
-            const bx = x + p; const by = y + p;
-            const bw = BLOCK_SIZE - p*2; const bh = BLOCK_SIZE - p*2;
-            
-            ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, r); ctx.fill();
-            if (isSel) { 
-              ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.stroke(); 
-              // Inner pulse
-              ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.fill();
-            }
+            const p = 8; const r = 18;
+            ctx.beginPath(); ctx.roundRect(x+p, y+p, BLOCK_SIZE-p*2, BLOCK_SIZE-p*2, r); ctx.fill();
+            if (isS) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.stroke(); ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fill(); }
           });
-          if (shake > 0) ctx.restore();
-          frame = requestAnimationFrame(render);
+          frame = requestAnimationFrame(draw);
         };
-        render(); return () => cancelAnimationFrame(frame);
-      }, [grid, selected, shake]);
+        draw(); return () => cancelAnimationFrame(frame);
+      }, [state.grid, selected]);
 
-      const handleAction = (clientX, clientY) => {
-        audio.init(); if (gameState.gameOver) return;
+      const getGridPos = (clientX, clientY) => {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = Math.floor((clientX - rect.left - 10) / BLOCK_SIZE);
         const y = Math.floor((clientY - rect.top - 10) / BLOCK_SIZE);
-        const idx = y * GRID_SIZE + x;
-        if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return;
+        if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return null;
+        return { x, y, idx: y * GRID_SIZE + x };
+      };
 
+      const handleDown = (e) => {
+        if (state.isProcessing || modal) return;
+        audio.init();
+        const pos = getGridPos(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
+        if (!pos) return;
+        
         if (selected) {
-          if (selected.idx === idx) { setSelected(null); return; }
-          const dist = Math.abs(selected.x - x) + Math.abs(selected.y - y);
-          if (dist === 1) { 
-            const success = onSwap(selected.idx, idx); 
-            if (!success) setShake(10);
-            setSelected(null); 
-          } else { 
-            setSelected({ x, y, idx }); audio.playSwap(); 
-          }
-        } else { 
-          setSelected({ x, y, idx }); audio.playSwap(); 
+          const dist = Math.abs(selected.x - pos.x) + Math.abs(selected.y - pos.y);
+          if (dist === 1) { processMove(selected.idx, pos.idx); setSelected(null); }
+          else { setSelected(pos); audio.swap(); }
+        } else {
+          setSelected(pos); audio.swap();
+          dragRef.current = pos;
         }
       };
 
-      return h('canvas', { 
-        ref: canvasRef, width: CANVAS_SIZE, height: CANVAS_SIZE, 
-        onMouseDown: (e) => handleAction(e.clientX, e.clientY),
-        onTouchStart: (e) => { e.preventDefault(); handleAction(e.touches[0].clientX, e.touches[0].clientY); }
-      });
-    }
+      const handleMove = (e) => {
+        if (!dragRef.current || state.isProcessing) return;
+        const pos = getGridPos(e.clientX || (e.touches && e.touches[0].clientX), e.clientY || (e.touches && e.touches[0].clientY));
+        if (!pos) return;
+        
+        const dist = Math.abs(dragRef.current.x - pos.x) + Math.abs(dragRef.current.y - pos.y);
+        if (dist === 1) {
+          processMove(dragRef.current.idx, pos.idx);
+          dragRef.current = null;
+          setSelected(null);
+        }
+      };
 
-    function App() {
-      const [gameState, setGameState] = useState(() => {
-        const saved = localStorage.getItem('neon_v3');
-        return saved ? JSON.parse(saved) : {
-          phase: 1, score: 0, moves: PHASES[0].moves,
-          grid: Array(25).fill(0).map(() => ({ color: COLORS[Math.floor(Math.random()*COLORS.length)].main })),
-          gameOver: false, sessionStart: Date.now()
-        };
-      });
+      const handleUp = () => { dragRef.current = null; };
 
-      const [metrics, setMetrics] = useState(() => {
-        const saved = localStorage.getItem('neon_metrics_v3');
-        const defaultId = 'NINJA_' + Math.random().toString(36).substr(2, 4).toUpperCase();
-        return saved ? JSON.parse(saved) : { totalScore: 0, dailyStreak: 0, lastPlayDate: null, userId: defaultId };
-      });
-
-      const [leaderboard, setLeaderboard] = useState([]);
-      const [combo, setCombo] = useState(0);
-      const [showWin, setShowWin] = useState(false);
-      const [showHelp, setShowHelp] = useState(false);
-
-      useEffect(() => { localStorage.setItem('neon_v3', JSON.stringify(gameState)); }, [gameState]);
-      useEffect(() => { localStorage.setItem('neon_metrics_v3', JSON.stringify(metrics)); }, [metrics]);
-
-      const loadLB = async () => { try { const r = await fetch('/api/leaderboard'); const d = await r.json(); if (Array.isArray(d)) setLeaderboard(d); } catch(e){} };
-      useEffect(() => { loadLB(); }, []);
-
-      const handleSwap = (idx1, idx2) => {
-        if (gameState.moves <= 0 || gameState.gameOver) return false;
-        const newGrid = [...gameState.grid];
+      const processMove = async (idx1, idx2) => {
+        setState(s => ({ ...s, isProcessing: true }));
+        const newGrid = [...state.grid];
         [newGrid[idx1], newGrid[idx2]] = [newGrid[idx2], newGrid[idx1]];
         
-        let cCombo = 0; let matched = true; let tMatched = 0;
-        while (matched) {
-          matched = false; const toRem = new Set();
-          for (let i = 0; i < 25; i++) {
-            const r = Math.floor(i / GRID_SIZE); const c = i % GRID_SIZE;
-            if (c <= GRID_SIZE-3 && newGrid[i].color === newGrid[i+1].color && newGrid[i].color === newGrid[i+2].color) [i, i+1, i+2].forEach(ix => toRem.add(ix));
-            if (r <= GRID_SIZE-3 && newGrid[i].color === newGrid[i+GRID_SIZE].color && newGrid[i].color === newGrid[i+GRID_SIZE*2].color) [i, i+GRID_SIZE, i+GRID_SIZE*2].forEach(ix => toRem.add(ix));
-          }
-          if (toRem.size > 0) {
-            matched = true; cCombo++; tMatched += toRem.size; audio.playMatch(cCombo);
-            toRem.forEach(ix => newGrid[ix] = null);
-            for (let c = 0; c < GRID_SIZE; c++) {
-              const col = []; for (let r = 0; r < GRID_SIZE; r++) if (newGrid[r*GRID_SIZE+c]) col.push(newGrid[r*GRID_SIZE+c]);
-              while (col.length < GRID_SIZE) col.unshift({ color: COLORS[Math.floor(Math.random()*COLORS.length)].main });
-              for (let r = 0; r < GRID_SIZE; r++) newGrid[r*GRID_SIZE+c] = col[r];
-            }
-          }
+        let matches = findMatches(newGrid);
+        if (matches.size === 0) {
+          audio.err();
+          setTimeout(() => setState(s => ({ ...s, isProcessing: false })), 200);
+          return;
         }
-        
-        if (tMatched === 0) { audio.playError(); return false; }
 
-        const nScore = gameState.score + (tMatched * 10 * cCombo);
-        const nMoves = gameState.moves - 1;
-        const target = PHASES[gameState.phase-1].target;
+        audio.swap();
+        let totalScore = state.score;
+        let combo = 0;
+
+        while (matches.size > 0) {
+          combo++;
+          totalScore += matches.size * 10 * combo;
+          audio.match(combo);
+          
+          matches.forEach(idx => newGrid[idx] = null);
+          for (let c = 0; c < GRID_SIZE; c++) {
+            let col = [];
+            for (let r = 0; r < GRID_SIZE; r++) if (newGrid[r*GRID_SIZE+c]) col.push(newGrid[r*GRID_SIZE+c]);
+            while (col.length < GRID_SIZE) col.unshift({ color: COLORS[Math.floor(Math.random()*COLORS.length)].main });
+            for (let r = 0; r < GRID_SIZE; r++) newGrid[r*GRID_SIZE+c] = col[r];
+          }
+          setState(s => ({ ...s, grid: [...newGrid], score: totalScore }));
+          await new Promise(r => setTimeout(r, 250));
+          matches = findMatches(newGrid);
+        }
+
+        const target = 500 + (state.level * 1000);
+        const nextMoves = state.moves - 1;
         
-        let gOver = false;
-        if (nScore >= target) { gOver = 'won'; audio.playWin(); setShowWin(true); setMetrics(m => ({ ...m, totalScore: m.totalScore + nScore })); }
-        else if (nMoves <= 0) { gOver = 'lost'; audio.playError(); }
-        
-        setCombo(cCombo);
-        setGameState(prev => ({ ...prev, grid: newGrid, score: nScore, moves: nMoves, gameOver: gOver }));
-        if (gOver) sync(nScore, metrics.dailyStreak);
-        return true;
+        if (totalScore >= target) { audio.win(); setModal('WIN'); sync(totalScore); }
+        else if (nextMoves <= 0) { audio.err(); setModal('LOSE'); }
+
+        setState(s => ({ ...s, score: totalScore, moves: nextMoves, isProcessing: false }));
       };
 
-      const sync = async (s, st) => {
-        const p = { user_id: metrics.userId, phase_level: gameState.phase, score: s, total_score: metrics.totalScore + s, daily_streak: st, session_time: (Date.now()-gameState.sessionStart)/1000 };
-        fetch('/api/save-game', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }).then(() => loadLB()).catch(() => {});
+      const findMatches = (grid) => {
+        const matches = new Set();
+        for (let i = 0; i < 25; i++) {
+          const r = Math.floor(i / GRID_SIZE); const c = i % GRID_SIZE;
+          if (c <= GRID_SIZE-3 && grid[i] && grid[i+1] && grid[i+2] && grid[i].color === grid[i+1].color && grid[i].color === grid[i+2].color) [i, i+1, i+2].forEach(ix => matches.add(ix));
+          if (r <= GRID_SIZE-3 && grid[i] && grid[i+GRID_SIZE] && grid[i+GRID_SIZE*2] && grid[i].color === grid[i+GRID_SIZE].color && grid[i].color === grid[i+GRID_SIZE*2].color) [i, i+GRID_SIZE, i+GRID_SIZE*2].forEach(ix => matches.add(ix));
+        }
+        return matches;
+      };
+
+      const sync = (s) => {
+        const p = { user_id: state.userId, phase_level: state.level, score: s, total_score: s, daily_streak: 1, session_time: 10 };
+        fetch('/api/save-game', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) });
       };
 
       return h('div', { className: 'app-container' },
         h('div', { className: 'game-panel' },
           h('div', { className: 'game-header' }, h('h1', null, 'NEON BLAST')),
-          h(GameCanvas, { grid: gameState.grid, onSwap: handleSwap, gameState, combo }),
-          h('div', { className: 'stats-grid' },
-            h('div', { className: 'stat-card' }, h('div', { className: 'stat-label' }, 'Pontos'), h('div', { className: 'stat-value score-pts' }, gameState.score)),
-            h('div', { className: 'stat-card' }, h('div', { className: 'stat-label' }, 'Vidas'), h('div', { className: 'stat-value' }, gameState.moves)),
-            h('div', { className: 'stat-card' }, h('div', { className: 'stat-label' }, 'Meta'), h('div', { className: 'stat-value' }, PHASES[gameState.phase-1].target))
+          h('canvas', { 
+            ref: canvasRef, width: CANVAS_SIZE, height: CANVAS_SIZE,
+            onMouseDown: handleDown, onMouseMove: handleMove, onMouseUp: handleUp,
+            onTouchStart: handleDown, onTouchMove: (e) => { e.preventDefault(); handleMove(e); }, onTouchEnd: handleUp
+          }),
+          h('div', { className: 'stats-row' },
+            h('div', { className: 'stat-box' }, h('div', { className: 'stat-label' }, 'Score'), h('div', { className: 'stat-value', style: { color: 'var(--success)' } }, state.score)),
+            h('div', { className: 'stat-box' }, h('div', { className: 'stat-label' }, 'Moves'), h('div', { className: 'stat-value', style: { color: state.moves < 5 ? 'var(--danger)' : 'var(--warning)' } }, state.moves)),
+            h('div', { className: 'stat-box' }, h('div', { className: 'stat-label' }, 'Target'), h('div', { className: 'stat-value', style: { color: 'var(--accent)' } }, 500 + state.level * 1000))
           ),
-          h('div', { className: 'controls' },
-            gameState.gameOver === 'won' ? h('button', { onClick: () => {
-              const nP = gameState.phase + 1;
-              setGameState({ phase: nP, score: 0, moves: PHASES[nP-1].moves, grid: Array(25).fill(0).map(() => ({ color: COLORS[Math.floor(Math.random()*COLORS.length)].main })), gameOver: false, sessionStart: Date.now() });
-              setShowWin(false);
-            } }, 'PRÓXIMO NÍVEL →') : 
-            h('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px' } },
-              h('button', { onClick: () => setGameState({ ...gameState, score: 0, moves: PHASES[gameState.phase-1].moves, grid: Array(25).fill(0).map(() => ({ color: COLORS[Math.floor(Math.random()*COLORS.length)].main })), gameOver: false }), className: 'secondary' }, 'REINICIAR FASE'),
-              gameState.gameOver === 'lost' && h('button', { onClick: () => setGameState(g => ({ ...g, moves: 5, gameOver: false })), style: { background: '#d97706', color: '#000' } }, '📺 +5 JOGADAS (ADS)')
-            )
+          h('div', { className: 'lb-card' },
+            h('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' } }, h('span', { style: { color: '#888' } }, 'ID: ' + state.userId), h('span', { style: { color: 'var(--accent)' } }, 'RANKING')),
+            lb.slice(0, 5).map((item, i) => h('div', { key: i, className: `lb-row ${item.user_id === state.userId ? 'me' : ''}` }, h('span', null, `#${i+1} ${item.user_id}`), h('span', null, item.total_score)))
           ),
-          showWin && h('div', { className: 'toast' }, '✨ Nível Concluído!'),
-          h('div', { className: 'ad-placeholder' }, 'Espaço para Google AdSense Banner')
+          h('div', { className: 'ad-banner' }, 'AD GOOGLE ADSENSE'),
+          h('button', { className: 'btn-action secondary', onClick: () => setModal('HELP') }, 'COMO JOGAR')
         ),
-        h('div', { className: 'dashboard-panel' },
-          h('div', { className: 'streak-banner' }, h('div', { className: 'streak-number' }, `🔥 ${metrics.dailyStreak}`), h('div', { className: 'streak-text' }, 'DIAS SEGUIDOS')),
-          h('div', { className: 'glass-card' },
-            h('div', { className: 'player-profile' },
-              h('div', { className: 'avatar' }, metrics.userId[0]),
-              h('div', { className: 'nick-info' }, h('span', { className: 'nick-label' }, 'Seu Nickname:'), h('span', { className: 'nick-name' }, metrics.userId))
-            ),
-            h('h3', { style: { fontSize: '14px', color: 'var(--accent)', marginBottom: '10px' } }, '🏆 RANKING GLOBAL'),
-            leaderboard.map((item, i) => h('div', { key: i, className: `leaderboard-item ${item.user_id === metrics.userId ? 'me' : ''}` },
-              h('span', null, h('b', { style: { color: 'var(--accent)' } }, `#${i+1} `), item.user_id),
-              h('span', { className: 'score-pts' }, item.total_score)
-            ))
+        modal === 'WIN' && h('div', { className: 'modal' }, h('div', { className: 'modal-content' }, 
+          h('h2', { style: { color: 'var(--success)' } }, 'EXCELENTE!'),
+          h('p', { style: { margin: '20px 0' } }, `Você passou para o nível ${state.level + 1}`),
+          h('button', { className: 'btn-action', onClick: () => {
+            const nextL = state.level + 1;
+            setState({ ...state, level: nextL, score: 0, moves: Math.max(8, 25-Math.floor(nextL/2)), grid: Array(25).fill(0).map(() => ({ color: COLORS[Math.floor(Math.random()*COLORS.length)].main })), isProcessing: false });
+            setModal(null);
+          } }, 'PRÓXIMA FASE →')
+        )),
+        modal === 'LOSE' && h('div', { className: 'modal' }, h('div', { className: 'modal-content' }, 
+          h('h2', { style: { color: 'var(--danger)' } }, 'FIM DE JOGO'),
+          h('p', { style: { margin: '20px 0' } }, 'As jogadas acabaram.'),
+          h('button', { className: 'btn-action', onClick: () => {
+            setState({ ...state, score: 0, moves: 25, grid: Array(25).fill(0).map(() => ({ color: COLORS[Math.floor(Math.random()*COLORS.length)].main })), isProcessing: false });
+            setModal(null);
+          } }, 'RECOMEÇAR')
+        )),
+        modal === 'HELP' && h('div', { className: 'modal' }, h('div', { className: 'modal-content' }, 
+          h('h2', { style: { color: 'var(--accent)' } }, 'TUTORIAL'),
+          h('div', { style: { textAlign: 'left', margin: '20px 0', fontSize: '15px', color: '#ccc', display: 'flex', flexDirection: 'column', gap: '10px' } }, 
+            h('p', null, '👉 ARRASTE ou toque para trocar blocos.'),
+            h('p', null, '💎 Alinhe 3 ou mais para explodir.'),
+            h('p', null, '🔥 Combos dão muito mais pontos!')
           ),
-          h('button', { onClick: () => setShowHelp(true), className: 'secondary' }, 'COMO JOGAR')
-        ),
-        showHelp && h('div', { className: 'toast', style: { width: '90%', fontSize: '14px', cursor: 'pointer' }, onClick: () => setShowHelp(false) },
-          h('h2', { style: { color: 'var(--accent)', marginBottom: '10px' } }, 'TUTORIAL'),
-          h('p', null, '💎 Clique em 1 bloco e depois em um ADJACENTE para trocar.'),
-          h('p', null, '🎯 Alinhe 3 ou mais cores iguais para pontuar.'),
-          h('p', null, '💡 Trocas na diagonal não são permitidas!'),
-          h('button', { style: { marginTop: '15px' } }, 'ENTENDI!')
-        )
+          h('button', { className: 'btn-action', onClick: () => setModal(null) }, 'VAMOS JOGAR!')
+        ))
       );
     }
 
