@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NEON BLAST - Ultra Addictive Puzzle</title>
+  <script>
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      const err = `Error: ${msg}\nLine: ${lineNo}\nFile: ${url}`;
+      console.error(err);
+      const errorDiv = document.createElement('div');
+      errorDiv.style = 'position:fixed;top:0;left:0;width:100%;background:red;color:white;padding:20px;z-index:9999;font-family:monospace;word-break:break-all;';
+      errorDiv.innerHTML = err.replace(/\n/g, '<br>');
+      if (document.body) document.body.appendChild(errorDiv);
+      return false;
+    };
+  </script>
+  <script crossorigin src="/react.min.js"></script>
+  <script crossorigin src="/react-dom.min.js"></script>
+  <style>
+    :root {
+      --bg: #050505;
+      --card-bg: rgba(25, 25, 25, 0.8);
+      --accent: #00f2ff;
+      --success: #00ff88;
+      --danger: #ff0055;
+      --warning: #ffaa00;
+      --glass: rgba(255, 255, 255, 0.05);
+      --border: rgba(255, 255, 255, 0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { 
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: var(--bg); 
+      color: #fff;
+      overflow-x: hidden;
+      background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050505 100%);
+      min-height: 100vh;
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+
+    @media (min-width: 1024px) {
+      .app-container { flex-direction: row; align-items: flex-start; justify-content: center; }
+    }
+
+    .game-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .game-header { text-align: center; margin-bottom: 20px; }
+    .game-header h1 {
+      font-size: 28px;
+      background: linear-gradient(to right, var(--accent), #7000ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    .canvas-container { position: relative; margin: 0 auto; display: flex; justify-content: center; }
+    canvas {
+      display: block;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.3);
+      border: 2px solid var(--border);
+      box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+      touch-action: none;
+    }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
+    .stat-card {
+      background: var(--glass);
+      padding: 12px;
+      border-radius: 16px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .stat-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+    .score-value { color: var(--success); }
+    .moves-value { color: var(--warning); }
+    .target-value { color: var(--accent); }
+
+    .dashboard-panel { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; }
+    .glass-card { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 20px; padding: 20px; }
+
+    .streak-banner {
+      background: linear-gradient(135deg, #ff0080 0%, #7928ca 100%);
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .streak-number { font-size: 42px; font-weight: 900; }
+    .streak-text { font-size: 14px; opacity: 0.8; font-weight: 500; }
+
+    .controls { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+    button {
+      background: linear-gradient(to right, #2563eb, #7c3aed);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:active { transform: scale(0.96); }
+    button.secondary { background: var(--glass); border: 1px solid var(--border); }
+
+    .phase-badge { padding: 6px 12px; background: var(--glass); border: 1px solid var(--border); border-radius: 50px; font-size: 11px; display: inline-block; margin: 4px; }
+    .phase-badge.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+    .toast {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      padding: 20px; border-radius: 12px; z-index: 100; text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .game-panel { padding: 16px; border-radius: 0; border: none; max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 24px; color: #fff;">
+      Loading NEON BLAST...
+    </div>
+  </div>
+
+  <script>
+    const h = React.createElement;
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    const COLORS = [
+      { main: '#ff3d00', glow: 'rgba(255, 61, 0, 0.5)' },
+      { main: '#00e5ff', glow: 'rgba(0, 229, 255, 0.5)' },
+      { main: '#ffea00', glow: 'rgba(255, 234, 0, 0.5)' },
+      { main: '#d500f9', glow: 'rgba(213, 0, 249, 0.5)' },
+      { main: '#00e676', glow: 'rgba(0, 230, 118, 0.5)' }
+    ];
+
+    const GRID_SIZE = 5;
+    const BLOCK_SIZE = 70;
+    const CANVAS_SIZE = GRID_SIZE * BLOCK_SIZE + 20;
+
+    const PHASES = Array.from({ length: 50 }, (_, i) => ({
+      level: i + 1,
+      moves: Math.max(8, 25 - Math.floor(i / 3)),
+      target: 500 + (i * 1000)
+    }));
+
+    class GameAudio {
+      constructor() { this.ctx = null; this.enabled = true; }
+      init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+      playNote(freq, type, decay) {
+        if (!this.enabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + decay);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + decay);
+      }
+      playSwap() { this.playNote(400, 'sine', 0.1); }
+      playMatch(combo = 0) { 
+        this.playNote(600 + (combo * 100), 'triangle', 0.2); 
+        setTimeout(() => this.playNote(800 + (combo * 100), 'triangle', 0.2), 50);
+      }
+      playLevelUp() { [440, 554, 659, 880].forEach((f, i) => setTimeout(() => this.playNote(f, 'sine', 0.5), i * 100)); }
+      playFail() { this.playNote(150, 'sawtooth', 0.4); }
+    }
+
+    const audio = new GameAudio();
+
+    function GameCanvas({ grid, onSwap, gameState, combo }) {
+      const canvasRef = useRef(null);
+      const [selected, setSelected] = useState(null);
+      const [shake, setShake] = useState(0);
+
+      useEffect(() => { if (combo > 0) setShake(10); }, [combo]);
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        let frame;
+        const render = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          if (shake > 0) {
+            ctx.save();
+            ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+            setShake(s => Math.max(0, s - 1));
+          }
+          grid.forEach((block, i) => {
+            const x = (i % GRID_SIZE) * BLOCK_SIZE + 10;
+            const y = Math.floor(i / GRID_SIZE) * BLOCK_SIZE + 10;
+            const colorObj = COLORS.find(c => c.main === block.color) || COLORS[0];
+            ctx.shadowBlur = 15; ctx.shadowColor = colorObj.glow; ctx.fillStyle = colorObj.main;
+            const padding = 6; const radius = 12;
+            const bx = x + padding; const by = y + padding;
+            const bw = BLOCK_SIZE - padding * 2; const bh = BLOCK_SIZE - padding * 2;
+            ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, radius); ctx.fill();
+            ctx.shadowBlur = 0; ctx.fillStyle = 'rgba(255,255,255,0.1)';
+            ctx.beginPath(); ctx.roundRect(bx, by, bw, bh/2, radius); ctx.fill();
+            if (selected && selected.idx === i) {
+              ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.strokeRect(bx - 3, by - 3, bw + 6, bh + 6);
+            }
+          });
+          if (shake > 0) ctx.restore();
+          frame = requestAnimationFrame(render);
+        };
+        render(); return () => cancelAnimationFrame(frame);
+      }, [grid, selected, shake]);
+
+      const handleClick = (e) => {
+        audio.init();
+        if (gameState.gameOver) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = Math.floor((e.clientX - rect.left - 10) / BLOCK_SIZE);
+        const y = Math.floor((e.clientY - rect.top - 10) / BLOCK_SIZE);
+        const idx = y * GRID_SIZE + x;
+        if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return;
+        if (selected) {
+          const dist = Math.abs(selected.x - x) + Math.abs(selected.y - y);
+          if (dist === 1) { onSwap(selected.idx, idx); setSelected(null); }
+          else { setSelected({ x, y, idx }); }
+        } else { setSelected({ x, y, idx }); }
+      };
+
+      return h('canvas', { ref: canvasRef, width: CANVAS_SIZE, height: CANVAS_SIZE, onClick: handleClick });
+    }
+
+    function App() {
+      const [gameState, setGameState] = useState(() => {
+        const saved = localStorage.getItem('neonblast_game');
+        return saved ? JSON.parse(saved) : {
+          phase: 1, score: 0, moves: PHASES[0].moves,
+          grid: Array(25).fill(0).map(() => ({ color: COLORS[Math.floor(Math.random() * COLORS.length)].main })),
+          gameOver: false, sessionStart: Date.now()
+        };
+      });
+
+      const [metrics, setMetrics] = useState(() => {
+        const saved = localStorage.getItem('neonblast_metrics');
+        return saved ? JSON.parse(saved) : { totalScore: 0, dailyStreak: 0, lastPlayDate: null };
+      });
+
+      const [combo, setCombo] = useState(0);
+      const [showWin, setShowWin] = useState(false);
+
+      useEffect(() => { localStorage.setItem('neonblast_game', JSON.stringify(gameState)); }, [gameState]);
+      useEffect(() => { localStorage.setItem('neonblast_metrics', JSON.stringify(metrics)); }, [metrics]);
+
+      const checkStreak = useCallback(() => {
+        const today = new Date().toDateString();
+        if (metrics.lastPlayDate === today) return;
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        let newStreak = metrics.dailyStreak;
+        if (metrics.lastPlayDate === yesterday) newStreak++; else newStreak = 1;
+        setMetrics(prev => ({ ...prev, dailyStreak: newStreak, lastPlayDate: today }));
+      }, [metrics.lastPlayDate, metrics.dailyStreak]);
+
+      useEffect(() => { checkStreak(); }, []);
+
+      const handleSwap = (idx1, idx2) => {
+        if (gameState.moves <= 0 || gameState.gameOver) return;
+        audio.playSwap();
+        const newGrid = [...gameState.grid];
+        [newGrid[idx1], newGrid[idx2]] = [newGrid[idx2], newGrid[idx1]];
+        let currentCombo = 0; let matched = true; let totalMatched = 0;
+        while (matched) {
+          matched = false; const toRemove = new Set();
+          for (let i = 0; i < 25; i++) {
+            const r = Math.floor(i / GRID_SIZE); const c = i % GRID_SIZE;
+            if (c <= GRID_SIZE - 3 && newGrid[i].color === newGrid[i+1].color && newGrid[i].color === newGrid[i+2].color) [i, i+1, i+2].forEach(idx => toRemove.add(idx));
+            if (r <= GRID_SIZE - 3 && newGrid[i].color === newGrid[i+GRID_SIZE].color && newGrid[i].color === newGrid[i+GRID_SIZE*2].color) [i, i+GRID_SIZE, i+GRID_SIZE*2].forEach(idx => toRemove.add(idx));
+          }
+          if (toRemove.size > 0) {
+            matched = true; currentCombo++; totalMatched += toRemove.size; audio.playMatch(currentCombo);
+            toRemove.forEach(idx => newGrid[idx] = null);
+            for (let c = 0; c < GRID_SIZE; c++) {
+              const column = []; for (let r = 0; r < GRID_SIZE; r++) if (newGrid[r * GRID_SIZE + c]) column.push(newGrid[r * GRID_SIZE + c]);
+              while (column.length < GRID_SIZE) column.unshift({ color: COLORS[Math.floor(Math.random() * COLORS.length)].main });
+              for (let r = 0; r < GRID_SIZE; r++) newGrid[r * GRID_SIZE + c] = column[r];
+            }
+          }
+        }
+        const newScore = gameState.score + (totalMatched * 10 * currentCombo); const newMoves = gameState.moves - 1;
+        const target = PHASES[gameState.phase - 1].target;
+        let gameOver = false;
+        if (newScore >= target) { gameOver = 'won'; audio.playLevelUp(); setShowWin(true); }
+        else if (newMoves <= 0) { gameOver = 'lost'; audio.playFail(); }
+        setCombo(currentCombo); setGameState(prev => ({ ...prev, grid: newGrid, score: newScore, moves: newMoves, gameOver }));
+        if (gameOver) syncData(newScore, metrics.dailyStreak);
+      };
+
+      const syncData = async (score, streak) => {
+        const userId = localStorage.getItem('user_id') || 'p_' + Math.random().toString(36).substr(2, 5);
+        if (!localStorage.getItem('user_id')) localStorage.setItem('user_id', userId);
+
+        const payload = { 
+          user_id: userId, 
+          phase_level: gameState.phase, 
+          score: score, 
+          total_sessions: gameState.phase, // Simplification
+          total_score: metrics.totalScore,
+          daily_streak: streak, 
+          session_time: (Date.now() - gameState.sessionStart) / 1000,
+          updated_at: new Date().toISOString() 
+        };
+        fetch('/api/save-game', { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload) 
+        }).catch((err) => console.error("Sync error:", err));
+      };
+
+      return h('div', { className: 'app-container' },
+        h('div', { className: 'game-panel' },
+          h('div', { className: 'game-header' }, h('h1', null, 'NEON BLAST')),
+          h('div', { className: 'canvas-container' },
+            h(GameCanvas, { grid: gameState.grid, onSwap: handleSwap, gameState, combo }),
+            showWin && h('div', { className: 'toast', style: { background: 'var(--success)', color: '#000' } }, 'LEVEL COMPLETE!'),
+            gameState.gameOver === 'lost' && h('div', { className: 'toast', style: { background: 'var(--danger)' } }, 'GAME OVER')
+          ),
+          h('div', { className: 'stats-grid' },
+            h('div', { className: 'stat-card' }, h('div', { className: 'stat-label' }, 'Score'), h('div', { className: 'stat-value score-value' }, gameState.score)),
+            h('div', { className: 'stat-card' }, h('div', { className: 'stat-label' }, 'Moves'), h('div', { className: 'stat-value moves-value' }, gameState.moves)),
+            h('div', { className: 'stat-card' }, h('div', { className: 'stat-label' }, 'Goal'), h('div', { className: 'stat-value target-value' }, PHASES[gameState.phase - 1].target))
+          ),
+          h('div', { className: 'controls' },
+            gameState.gameOver === 'won' ? h('button', { onClick: () => {
+              const nextPh = Math.min(PHASES.length, gameState.phase + 1);
+              setGameState({ phase: nextPh, score: 0, moves: PHASES[nextPh - 1].moves, grid: Array(25).fill(0).map(() => ({ color: COLORS[Math.floor(Math.random() * COLORS.length)].main })), gameOver: false, sessionStart: Date.now() });
+              setShowWin(false);
+            } }, 'NEXT LEVEL →') : h('button', { onClick: () => setGameState({ phase: 1, score: 0, moves: PHASES[0].moves, grid: Array(25).fill(0).map(() => ({ color: COLORS[Math.floor(Math.random() * COLORS.length)].main })), gameOver: false, sessionStart: Date.now() }), className: 'secondary' }, 'RESTART LEVEL')
+          )
+        ),
+        h('div', { className: 'dashboard-panel' },
+          h('div', { className: 'streak-banner' }, h('div', { className: 'streak-number' }, `🔥 ${metrics.dailyStreak}`), h('div', { className: 'streak-text' }, 'DAY STREAK')),
+          h('div', { className: 'glass-card' },
+            h('h3', { style: { fontSize: '14px', color: '#888', marginBottom: '10px' } }, 'PROGRESS'),
+            h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '5px' } },
+              PHASES.slice(0, 15).map(p => h('div', { key: p.level, className: `phase-badge ${gameState.phase >= p.level ? 'active' : ''}` }, `Lvl ${p.level}`))
+            )
+          )
+        )
+      );
+    }
+
+    try {
+      const root = ReactDOM.createRoot ? ReactDOM.createRoot(document.getElementById('root')) : { render: (el) => ReactDOM.render(el, document.getElementById('root')) };
+      root.render(h(App));
+    } catch (e) { window.onerror(e.message, 'init', 0, 0, e); }
+  </script>
+</body>
+</html>

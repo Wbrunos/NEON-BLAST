@@ -1,0 +1,20 @@
+{
+  "name": "swap-blast",
+  "version": "1.0.0",
+  "description": "Puzzle game com dashboard tempo real",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "local": "node --env-file=.env.local server.js",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "vercel": "^28.0.0"
+  }
+}
