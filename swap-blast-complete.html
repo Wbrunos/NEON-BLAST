@@ -15,8 +15,16 @@
       return false;
     };
   </script>
-  <script crossorigin src="/react.min.js"></script>
-  <script crossorigin src="/react-dom.min.js"></script>
+  <script>
+    function loadFallback(src) {
+      const script = document.createElement('script');
+      script.src = src;
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    }
+  </script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" onerror="loadFallback('/react.min.js')"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" onerror="loadFallback('/react-dom.min.js')"></script>
   <style>
     :root {
       --bg: #050505;
