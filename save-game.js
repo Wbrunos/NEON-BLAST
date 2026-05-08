@@ -29,7 +29,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'user_id required' });
     }
 
-    const { data, error } = await supabase
+    // 1. Update Player Record
+    const { data: playerData, error: playerError } = await supabase
       .from('players')
       .upsert(
         {
@@ -45,12 +46,28 @@ export default async function handler(req, res) {
         { onConflict: 'user_id' }
       );
 
-    if (error) {
-      console.error('Supabase error:', error);
-      return res.status(500).json({ error: 'Database error' });
+    if (playerError) {
+      console.error('Player update error:', playerError);
+      return res.status(500).json({ error: 'Database error (players)' });
     }
 
-    res.status(200).json({ success: true, data });
+    // 2. Record Session History
+    const { error: sessionError } = await supabase
+      .from('sessions')
+      .insert({
+        user_id,
+        phase_level,
+        score,
+        duration_seconds: session_time,
+        completed_at: new Date().toISOString()
+      });
+
+    if (sessionError) {
+      console.error('Session record error:', sessionError);
+      // We don't fail the whole request if only the history fails
+    }
+
+    res.status(200).json({ success: true, data: playerData });
   } catch (err) {
     console.error('Handler error:', err);
     res.status(500).json({ error: 'Internal error' });

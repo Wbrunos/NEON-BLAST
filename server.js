@@ -33,11 +33,27 @@ app.get('/', (req, res) => {
 // Mock Vercel API behavior
 app.post('/api/save-game', async (req, res) => {
   try {
-    // Vercel handlers receive req/res objects with some extra sugar,
-    // but the basic Express ones are compatible for this specific logic.
     await handler(req, res);
   } catch (error) {
     console.error('API Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+    const { data, error } = await supabase
+      .from('players')
+      .select('user_id, total_score, daily_streak')
+      .order('total_score', { ascending: false })
+      .limit(10);
+    
+    if (error) throw error;
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Leaderboard Error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
