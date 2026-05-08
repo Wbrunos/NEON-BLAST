@@ -428,7 +428,7 @@
         h('div', { className: 'dashboard-panel' },
           h('div', { className: 'streak-banner' }, h('div', { className: 'streak-number' }, `🔥 ${metrics.dailyStreak}`), h('div', { className: 'streak-text' }, 'DIAS SEGUIDOS')),
           h('div', { className: 'glass-card' },
-            h('h3', { style: { fontSize: '16px', color: var(--accent), marginBottom: '15px', textAlign: 'center' } }, '🏆 TOP 10 GLOBAL'),
+            h('h3', { style: { fontSize: '16px', color: 'var(--accent)', marginBottom: '15px', textAlign: 'center' } }, '🏆 TOP 10 GLOBAL'),
             leaderboard.map((item, i) => h('div', { key: i, className: 'leaderboard-item' },
               h('span', { className: 'rank' }, `#${i+1}`),
               h('span', { className: 'user-id' }, item.user_id),
