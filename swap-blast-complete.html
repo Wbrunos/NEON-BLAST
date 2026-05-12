@@ -70,9 +70,9 @@
     .shuffle-banner { background: linear-gradient(135deg, #7928ca, #ff0080); padding: 8px; border-radius: 12px; text-align: center; font-size: 12px; font-weight: 700; animation: pulse 0.5s ease-in-out 3; }
     @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
 
-    .lb-mini { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 10px; font-size: 11px; }
-    .lb-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); align-items: center; }
-    .lb-row.me { color: var(--accent); font-weight: 900; background: rgba(0, 242, 255, 0.05); border-radius: 8px; padding-left: 5px; padding-right: 5px; }
+    .lb-mini { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 8px; font-size: 10px; max-height: 100px; overflow-y: auto; }
+    .lb-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); align-items: center; }
+    .lb-row.me { color: var(--accent); font-weight: 900; background: rgba(0, 242, 255, 0.05); border-radius: 6px; padding-left: 4px; padding-right: 4px; }
     .rank-num { font-weight: 900; width: 25px; display: inline-block; }
     .rank-1 { color: #ffd700; } .rank-2 { color: #c0c0c0; } .rank-3 { color: #cd7f32; }
 
@@ -129,7 +129,7 @@
       const [st, setSt] = useState(() => {
         const s = localStorage.getItem('neon_v8');
         const id = 'Ninja_' + Math.random().toString(36).substr(2, 4).toUpperCase();
-        return s ? JSON.parse(s) : { lvl: 1, sc: 0, mv: 25, gd: Array(25).fill(0).map(() => ({ c: COLORS[Math.floor(Math.random()*5)].m })), id, pr: false, best: 0 };
+        return s ? JSON.parse(s) : { lvl: 1, sc: 0, mv: 30, gd: Array(25).fill(0).map(() => ({ c: COLORS[Math.floor(Math.random()*5)].m })), id, pr: false, best: 0 };
       });
 
       const [sel, setSel] = useState(null);
@@ -282,7 +282,7 @@
           mts = find(nG);
         }
         
-        const tgt = 500 + (st.lvl * 800);
+        const tgt = 500 + (st.lvl * 600);
         const nMV = st.mv - 1;
         const newBest = Math.max(st.best || 0, sc);
         if (sc >= tgt) { sfx.wn(); setMd('WIN'); sy(sc); }
@@ -305,13 +305,13 @@
         fetch('/api/save-game', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) });
       };
 
-      const tgt = 500 + (st.lvl * 800);
+      const tgt = 500 + (st.lvl * 600);
       const prog = Math.min(100, (st.sc / tgt) * 100);
 
       return h('div', { className: 'app-container' },
         h('div', { className: 'game-panel' },
           h('div', { className: 'header-bar' }, h('span', { className: 'logo' }, 'NEON BLAST'), h('span', { className: 'nick-badge' }, st.id)),
-          h('div', { className: 'header-bar' }, h('span', { className: 'streak-fire' }, `\uD83D\uDD25 LEVEL ${st.lvl}`), h('span', { style: { fontSize: '11px', color: '#888' } }, `BEST: ${st.best || 0}`)),
+          h('div', { className: 'header-bar' }, h('span', { className: 'streak-fire' }, `\uD83D\uDD25 NÍVEL ${st.lvl}`), h('span', { style: { fontSize: '11px', color: '#888' } }, `RECORDE: ${st.best || 0}`)),
           shuffleMsg && h('div', { className: 'shuffle-banner' }, '\u267B\uFE0F Sem jogadas! Embaralhando...'),
           h('div', { className: 'progress-container' }, h('div', { className: 'progress-bar', style: { width: `${prog}%` } }, h('div', { className: 'progress-glow' }))),
           h('div', { className: 'canvas-wrapper' },
@@ -323,9 +323,9 @@
             cbTxt && h('div', { className: 'combo-text', style: { left: cbTxt.x, top: cbTxt.y } }, cbTxt.t)
           ),
           h('div', { className: 'stats-row' },
-            h('div', { className: 'stat-box' }, h('div', { className: 'stat-label' }, 'Score'), h('div', { className: 'stat-value', style: { color: 'var(--success)' } }, st.sc)),
-            h('div', { className: 'stat-box' }, h('div', { className: 'stat-label' }, 'Moves'), h('div', { className: 'stat-value', style: { color: st.mv < 5 ? 'var(--danger)' : 'var(--warning)' } }, st.mv)),
-            h('div', { className: 'stat-box' }, h('div', { className: 'stat-label' }, 'Goal'), h('div', { className: 'stat-value' }, tgt))
+            h('div', { className: 'stat-box' }, h('div', { className: 'stat-label' }, 'Pontos'), h('div', { className: 'stat-value', style: { color: 'var(--success)' } }, st.sc)),
+            h('div', { className: 'stat-box' }, h('div', { className: 'stat-label' }, 'Jogadas'), h('div', { className: 'stat-value', style: { color: st.mv < 5 ? 'var(--danger)' : 'var(--warning)' } }, st.mv)),
+            h('div', { className: 'stat-box' }, h('div', { className: 'stat-label' }, 'Meta'), h('div', { className: 'stat-value' }, tgt))
           ),
           h('div', { className: 'lb-mini' },
             h('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '4px' } }, 
@@ -343,21 +343,22 @@
           ),
           h('div', { className: 'btn-row' },
             h('button', { className: 'btn-sm btn-hint', onClick: showHint }, '\uD83D\uDCA1 DICA'),
-            h('button', { className: 'btn-sm', onClick: () => { setSt({ ...st, sc: 0, mv: 25, gd: Array(25).fill(0).map(() => ({ c: COLORS[Math.floor(Math.random()*5)].m })), pr: false }); setSel(null); } }, 'REINICIAR'),
-            h('button', { className: 'btn-sm', onClick: () => setMd('HELP') }, '\u2753')
+            h('button', { className: 'btn-sm', onClick: () => { setSt({ ...st, sc: 0, mv: 30, gd: Array(25).fill(0).map(() => ({ c: COLORS[Math.floor(Math.random()*5)].m })), pr: false }); setSel(null); } }, 'REINICIAR'),
+            h('button', { className: 'btn-sm', onClick: () => setMd('HELP'), style: { background: 'rgba(0, 242, 255, 0.1)', color: 'var(--accent)', border: '1px solid var(--accent)' } }, 'REGRAS')
           ),
           st.mv <= 5 && st.mv > 0 && h('button', { className: 'btn-sm btn-ad', style: { width: '100%' }, onClick: () => { setSt(s => ({ ...s, mv: s.mv + 5 })); } }, '\uD83C\uDFAC VER AD +5 JOGADAS'),
-          h('div', { style: { textAlign: 'right', fontSize: '8px', opacity: 0.3, marginTop: '4px', letterSpacing: '1px' } }, 'v3.1')
+          h('div', { style: { textAlign: 'center', fontSize: '9px', opacity: 0.4, marginTop: '8px', letterSpacing: '0.5px' } }, 'Developed by ab4.space | v3.1')
         ),
-        md === 'WIN' && h('div', { className: 'modal' }, h('div', { className: 'modal-content' }, h('h1', { style: { color: 'var(--success)', fontSize: '32px' } }, 'BÔNUS!'), h('p', { style: { margin: '20px 0', fontSize: '18px' } }, `Nível ${st.lvl} concluído!`), h('button', { className: 'btn-main', onClick: () => { const nL = st.lvl + 1; setSt({ ...st, lvl: nL, sc: 0, mv: 25, gd: Array(25).fill(0).map(() => ({ c: COLORS[Math.floor(Math.random()*5)].m })), pr: false }); setMd(null); } }, 'PRÓXIMA FASE →'))),
-        md === 'LOSE' && h('div', { className: 'modal' }, h('div', { className: 'modal-content' }, h('h1', { style: { color: 'var(--danger)', fontSize: '32px' } }, 'PERDEU!'), h('p', { style: { margin: '20px 0' } }, 'Você ficou sem jogadas.'), h('button', { className: 'btn-main', onClick: () => { setSt({ ...st, sc: 0, mv: 25, gd: Array(25).fill(0).map(() => ({ c: COLORS[Math.floor(Math.random()*5)].m })), pr: false }); setMd(null); } }, 'RECOMEÇAR'))),
+        md === 'WIN' && h('div', { className: 'modal' }, h('div', { className: 'modal-content' }, h('h1', { style: { color: 'var(--success)', fontSize: '32px' } }, 'BÔNUS!'), h('p', { style: { margin: '20px 0', fontSize: '18px' } }, `Nível ${st.lvl} Concluído!`), h('button', { className: 'btn-main', onClick: () => { const nL = st.lvl + 1; setSt({ ...st, lvl: nL, sc: 0, mv: 30, gd: Array(25).fill(0).map(() => ({ c: COLORS[Math.floor(Math.random()*5)].m })), pr: false }); setMd(null); } }, 'PRÓXIMA FASE →'))),
+        md === 'LOSE' && h('div', { className: 'modal' }, h('div', { className: 'modal-content' }, h('h1', { style: { color: 'var(--danger)', fontSize: '32px' } }, 'FIM DE JOGO'), h('p', { style: { margin: '20px 0' } }, 'Suas jogadas acabaram.'), h('button', { className: 'btn-main', onClick: () => { setSt({ ...st, sc: 0, mv: 30, gd: Array(25).fill(0).map(() => ({ c: COLORS[Math.floor(Math.random()*5)].m })), pr: false }); setMd(null); } }, 'RECOMEÇAR'))),
         md === 'HELP' && h('div', { className: 'modal' }, h('div', { className: 'modal-content' }, 
-          h('h2', { style: { color: '#00f2ff', marginBottom: '25px' } }, 'COMO JOGAR'),
-          h('div', { className: 'rule-item' }, h('div', { className: 'rule-icon' }, '💎'), h('div', null, h('b', null, 'Combine 3:'), h('p', { style: { fontSize: '12px' } }, 'Troque ou arraste blocos para alinhar 3 cores.'))),
-          h('div', { className: 'rule-item' }, h('div', { className: 'rule-icon' }, '🔥'), h('div', null, h('b', null, 'Super Combos:'), h('p', { style: { fontSize: '12px' } }, 'Combine 4 ou mais para ganhar bônus gigantes.'))),
-          h('div', { className: 'rule-item' }, h('div', { className: 'rule-icon' }, '🎯'), h('div', null, h('b', null, 'Meta:'), h('p', { style: { fontSize: '12px' } }, 'Encha a barra de progresso antes das jogadas acabarem.'))),
-          h('div', { className: 'rule-item' }, h('div', { className: 'rule-icon' }, '♻️'), h('div', null, h('b', null, 'Sem Jogadas?'), h('p', { style: { fontSize: '12px' } }, 'O tabuleiro embaralha automaticamente!'))),
-          h('button', { className: 'btn-main', style: { marginTop: '10px' }, onClick: () => setMd(null) }, 'ESTOU PRONTO!')
+          h('h2', { style: { color: '#00f2ff', marginBottom: '20px' } }, 'COMO JOGAR'),
+          h('div', { className: 'rule-item' }, h('div', { className: 'rule-icon' }, '👉'), h('div', null, h('b', null, 'Passo 1:'), h('p', { style: { fontSize: '13px' } }, 'Arraste uma joia para trocar de lugar com a vizinha.'))),
+          h('div', { className: 'rule-item' }, h('div', { className: 'rule-icon' }, '💎'), h('div', null, h('b', null, 'Passo 2:'), h('p', { style: { fontSize: '13px' } }, 'Junte 3 cores iguais em linha para elas explodirem.'))),
+          h('div', { className: 'rule-item' }, h('div', { className: 'rule-icon' }, '💥'), h('div', null, h('b', null, 'Dica de Mestre:'), h('p', { style: { fontSize: '13px' } }, 'Explosões em sequência (Combos) dão muito mais pontos!'))),
+          h('div', { className: 'rule-item' }, h('div', { className: 'rule-icon' }, '🎯'), h('div', null, h('b', null, 'Objetivo:'), h('p', { style: { fontSize: '13px' } }, 'Encha a barra azul antes que as 30 jogadas acabem.'))),
+          h('div', { className: 'rule-item' }, h('div', { className: 'rule-icon' }, '💡'), h('div', null, h('b', null, 'Botão DICA:'), h('p', { style: { fontSize: '13px' } }, 'Se não souber o que fazer, clique em DICA para ver um movimento.'))),
+          h('button', { className: 'btn-main', style: { marginTop: '10px' }, onClick: () => setMd(null) }, 'ENTENDI, VAMOS JOGAR!')
         ))
       );
     }
